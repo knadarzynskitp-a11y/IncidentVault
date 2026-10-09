@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import { connectDatabase } from './config/db.js';
+import authRoutes from './api/routes/authRoutes.js'
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -17,6 +18,8 @@ app.use(cors({
 }));
 
 app.use(helmet())
+
+app.use('/auth', authRoutes)
 
 connectDatabase();
 
