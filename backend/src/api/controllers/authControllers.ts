@@ -31,3 +31,42 @@ export async function loginController(req: Request, res: Response)
          return errorHandler(res, error.message, error.statusCode);
     }
 }
+
+
+export async function registerController(req: Request, res: Response)
+{
+    const {name, lastname, email, password} = req.body;
+
+    try
+    {
+        await Service.registerService(name, lastname, email, password);
+
+        return res.json({
+            success:true
+        })
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode);
+    }
+    
+}
+
+
+export async function registerEndController(req: Request, res: Response)
+{
+    const {email, code} = req.body;
+
+    try
+    {
+        await Service.registerEndService(email, code);
+
+        return res.json({success:true})
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode);
+    }
+}
