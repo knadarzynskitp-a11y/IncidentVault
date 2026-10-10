@@ -5,6 +5,8 @@ import { handleServiceError } from "../utils/handleServiceError.js";
 import bcrypt from 'bcrypt'
 import { generateTokens } from "../utils/generateTokens.js";
 import sendEmailVerification from "../utils/mail/sendMail.js";
+import crypto from 'crypto'
+import sendResetMail from "../utils/mail/sendResetPasswordMail.js";
 
 export async function loginService(email: string, password: string)
 {
@@ -184,8 +186,112 @@ export async function registerEndService(email: string, code: string)
     {
         handleServiceError(err)
     }
+}
 
-    
 
+export async function forgotPasswordService(email:string)
+{
+    if(!email)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
 
+    email = email.trim();
+
+    if(!email)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+    else if(!validator.isEmail(email))
+    {
+        throw new AppError("Podany adres e-mail najprawdopodobniej nie jest adresem e-mail", 400)
+    }
+
+    try
+    {
+        const match = await Repo.findByEmail(email);
+
+        if(!match)
+        {
+            throw new AppError("Nie znaleziono użytkownika", 404)
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetLink = process.env.URL+`/reset-password/`+resetToken;
+        const expires_at = new Date(Date.now() + 10 * 60 * 1000);
+
+        await Repo.deleteResetPasswordDataById(match.id);
+        
+        //hash tokenu
+        const hashResetToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+        await Repo.createResetPasswordData(match.id, hashResetToken, expires_at);
+
+        await sendResetMail(email, resetLink);
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+}
+
+export async function resetPasswordService(password:string, token:string)
+{
+    if(!password || !token)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    password = password.trim()
+    token = token.trim()
+
+    if(!password || !token)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    if(!validator.isStrongPassword(password, {
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 0,
+        minLength: 8
+    }))
+    {
+        throw new AppError("Hasło musi zawierać co najmniej jedną małą, dużą literę, jedną cyfrę oraz minimum 8 znaków", 400)
+    }
+
+    const hashResetToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex'); 
+
+        try
+        {
+            const data = await Repo.takeResetPasswordDataByToken(hashResetToken);
+
+            if(!data)
+            {
+                throw new AppError("Nieprawidłowy token", 400)
+            }
+            else if(data.expires_at < new Date())
+            {
+                await Repo.deleteResetPasswordDataById(data.user_id)
+                throw new AppError("Link wygasł", 400);
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            await Repo.updateUser(data.user_id, hashedPassword);
+
+            await Repo.deleteResetPasswordDataById(data.user_id);
+
+        }
+        catch(err)
+        {
+            handleServiceError(err)
+        }
 }

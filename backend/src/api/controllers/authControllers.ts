@@ -70,3 +70,37 @@ export async function registerEndController(req: Request, res: Response)
         return errorHandler(res, error.message, error.statusCode);
     }
 }
+
+export async function forgotPasswordController(req: Request, res: Response)
+{
+    const {email} = req.body;
+
+    try
+    {
+        await Service.forgotPasswordService(email);
+
+        return res.json({success: true});
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode);
+    }
+}
+
+export async function resetPasswordController(req: Request, res: Response)
+{
+    const {password, token} = req.body;
+
+    try
+    {
+        await Service.resetPasswordService(password, token);
+
+        return res.json({success: true});
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode);
+    }
+}

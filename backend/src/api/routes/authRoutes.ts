@@ -6,9 +6,10 @@ const router = express.Router();
 router.post('/login', Controllers.loginController);
 router.post('/register', Controllers.registerController);
 router.post('/registerEnd', Controllers.registerEndController);
-router.post('/forgotPassword', );
-router.post('/resetPassword', );
+router.post('/forgotPassword', Controllers.forgotPasswordController);
+router.post('/resetPassword', Controllers.resetPasswordController);
 router.post('/logout', );
+router.get('refresh', )
 router.post('/nrtelAdd', );
 router.post('/nrtelEnd', );
 
