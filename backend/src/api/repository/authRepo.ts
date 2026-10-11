@@ -64,7 +64,7 @@ export async function takeRefreshTokenByToken(hashedRefreshToken:string)
 export async function deleteRefreshtokenByToken(hashedRefreshToken: string)
 {
     await pool.query(
-        "DELETE * FROM refreshtokens WHERE hashedrefreshtoken=$1",
+        "DELETE FROM refreshtokens WHERE hashedrefreshtoken=$1",
         [hashedRefreshToken]
     );
 }
@@ -72,7 +72,7 @@ export async function deleteRefreshtokenByToken(hashedRefreshToken: string)
 export async function deleteRefreshtokenById(user_id: number)
 {
     await pool.query(
-        "DELETE * FROM refreshtokens WHERE user_id=$1",
+        "DELETE FROM refreshtokens WHERE user_id=$1",
         [user_id]
     );
 }
@@ -84,7 +84,7 @@ export async function deleteRefreshtokenById(user_id: number)
 export async function deleteOldDataEmailVerification(email:string)
 {
     await pool.query(
-        "DELETE * FROM emailverification WHERE email=$1",
+        "DELETE FROM emailverification WHERE email=$1",
         [email]
     );
 }
@@ -115,7 +115,7 @@ export async function takeEmailVerificationDataByEmail(email: string)
 export async function deleteResetPasswordDataById(user_id: number)
 {
     await pool.query(
-        "DELETE * FROM resetpassword WHERE user_id=$1",
+        "DELETE FROM resetpassword WHERE user_id=$1",
         [user_id]
     );
 }

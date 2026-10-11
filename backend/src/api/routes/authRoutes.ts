@@ -8,9 +8,8 @@ router.post('/register', Controllers.registerController);
 router.post('/registerEnd', Controllers.registerEndController);
 router.post('/forgotPassword', Controllers.forgotPasswordController);
 router.post('/resetPassword', Controllers.resetPasswordController);
-router.post('/logout', );
-router.get('/refresh', )
-router.post('/nrtelAdd', );
-router.post('/nrtelEnd', );
+router.post('/logout', Controllers.logoutController);
+router.get('/refresh', Controllers.refreshController)
+
 
 export default router;

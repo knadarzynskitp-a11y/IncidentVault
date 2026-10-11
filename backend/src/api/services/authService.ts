@@ -289,6 +289,7 @@ export async function resetPasswordService(password:string, token:string)
             await Repo.updateUser(data.user_id, hashedPassword);
 
             await Repo.deleteResetPasswordDataById(data.user_id);
+            await Repo.deleteRefreshtokenById(data.user_id);
 
         }
         catch(err)
