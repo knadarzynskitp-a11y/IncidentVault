@@ -35,21 +35,21 @@ export async function loginService(email: string, password: string)
 
             if(!user)
             {
-                throw new AppError("Nieprawidłowy login lub hasło", 400)
+                throw new AppError("Nieprawidłowy e-mail lub hasło", 400)
             }
 
             const checkPassword = await bcrypt.compare(password, user.password);
 
             if(!checkPassword)
             {
-                throw new AppError("Nieprawidlówy login lub hasło", 400);
+                throw new AppError("Nieprawidłowy e-mail lub hasło", 400);
             }
 
             const user_id = user.id;
 
             const tokens = generateTokens(user_id);
 
-            await Repo.createRefreshtoken(tokens.hashedRefreshToken, tokens.expires_at);
+            await Repo.createRefreshtoken(tokens.hashedRefreshToken, tokens.expires_at, user_id);
 
             return {
                 accessToken: tokens.accessToken,
@@ -103,9 +103,8 @@ export async function registerService(name: string, lastname: string, email: str
     {
         throw new AppError("Hasło musi zawierać co najmniej jedną małą, dużą literę, jedną cyfrę oraz minimum 8 znaków", 400)
     }
-    if(password.length > 72)
-    {
-        throw new AppError("Hasło jest zbyt długie", 400)
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+        throw new AppError("Hasło jest zbyt długie", 400);
     }
     const zawieraCyfry = /\d/.test(name);
     const zawieraZnakiSpecjalne = /[^A-Za-z0-9]/.test(name);
@@ -127,11 +126,12 @@ export async function registerService(name: string, lastname: string, email: str
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const code = crypto.randomInt(100000, 1000000).toString();
+        const expires_at = new Date(Date.now() + 10 * 60 * 1000);
 
         await Repo.deleteOldDataEmailVerification(email);
 
-        await Repo.createEmailVerificationData(name, lastname, email, hashedPassword, code)
+        await Repo.createEmailVerificationData(name, lastname, email, hashedPassword, code, expires_at)
 
         await sendEmailVerification(email, code);
     }
@@ -170,6 +170,10 @@ export async function registerEndService(email: string, code: string)
         if(code !== data.code)
         {
             throw new AppError("Nieprawidłowy kod", 400)
+        }
+        else if(data.expires_at < new Date())
+        {
+            throw new AppError("Kod wygasł", 400)
         }
 
         const result = await Repo.findByEmail(email);
@@ -214,7 +218,7 @@ export async function forgotPasswordService(email:string)
 
         if(!match)
         {
-            throw new AppError("Nie znaleziono użytkownika", 404)
+            return;
         }
 
         const resetToken = crypto.randomBytes(32).toString('hex');
@@ -263,6 +267,9 @@ export async function resetPasswordService(password:string, token:string)
     }))
     {
         throw new AppError("Hasło musi zawierać co najmniej jedną małą, dużą literę, jedną cyfrę oraz minimum 8 znaków", 400)
+    }
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+        throw new AppError("Hasło jest zbyt długie", 400);
     }
 
     const hashResetToken = crypto
@@ -337,7 +344,7 @@ export async function refreshService(refreshToken: string)
 
         const tokens = generateTokens(data.user_id);
 
-        await Repo.createRefreshtoken(tokens.hashedRefreshToken, tokens.expires_at)
+        await Repo.createRefreshtoken(tokens.hashedRefreshToken, tokens.expires_at, data.user_id)
 
         return {
             accessToken: tokens.accessToken,

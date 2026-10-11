@@ -43,11 +43,11 @@ export async function updateUser(user_id:number, password: string)
 //=================REFRESH TOKENS OPERATION========================================================================================
 
 
-export async function createRefreshtoken(hashedRefreshToken: string, expires_at: Date)
+export async function createRefreshtoken(hashedRefreshToken: string, expires_at: Date, user_id: number)
 {
     await pool.query(
-        "INSERT INTO refreshtokens (hashedRefreshToken, expires_at) VALUES ($1, $2)",
-        [hashedRefreshToken, expires_at]
+        "INSERT INTO refreshtokens (hashedRefreshToken, user_id, expires_at) VALUES ($1, $2, $3)",
+        [hashedRefreshToken, user_id, expires_at]
     );
 }
 
@@ -89,11 +89,11 @@ export async function deleteOldDataEmailVerification(email:string)
     );
 }
 
-export async function createEmailVerificationData(name: string, lastname: string, email: string, hashedPassword: string, code: string)
+export async function createEmailVerificationData(name: string, lastname: string, email: string, hashedPassword: string, code: string, expires_at: Date)
 {
     await pool.query(
-        "INSERT INTO emailverification (name, lastname, email, password, code) VALUES ($1, $2, $3, $4, $5)",
-        [name, lastname, email, hashedPassword, code]
+        "INSERT INTO emailverification (name, lastname, email, password, code, expires_at) VALUES ($1, $2, $3, $4, $5, $6)",
+        [name, lastname, email, hashedPassword, code, expires_at]
     );
 }
 

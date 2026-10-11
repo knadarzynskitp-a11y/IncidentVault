@@ -1,10 +1,10 @@
-import dotenv from 'dotenv'
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import { connectDatabase } from './config/db.js';
 import authRoutes from './api/routes/authRoutes.js'
-dotenv.config();
+
 
 const PORT = Number(process.env.PORT) || 3000;
 

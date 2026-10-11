@@ -80,7 +80,7 @@ export async function forgotPasswordController(req: Request, res: Response)
     {
         await Service.forgotPasswordService(email);
 
-        return res.json({success: true});
+        return res.json({success: true, message: "Jeśli konto istnieje, wysłaliśmy maila z kodem"});
     }
     catch(err)
     {
