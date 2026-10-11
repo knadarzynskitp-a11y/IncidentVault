@@ -1,6 +1,7 @@
 import errorHandler from "../middleware/errors/errorHandler.js"
 import * as Service from '../services/authService.js'
 import type { Request, Response } from 'express';
+import { clearCookie } from "../utils/clearCookie.js";
 
 export async function loginController(req: Request, res: Response)
 {
@@ -103,4 +104,60 @@ export async function resetPasswordController(req: Request, res: Response)
         const error = err as {message: string; statusCode: number};
         return errorHandler(res, error.message, error.statusCode);
     }
+}
+
+export async function refreshController(req: Request, res: Response)
+{
+    const {refreshToken} = req.cookies;
+
+    try
+    {
+        const data = await Service.refreshService(refreshToken);
+
+        return res.cookie("refreshToken", data.refreshToken, {
+            httpOnly: true,
+            secure: process.env.STACK === 'production',
+            sameSite: "strict",
+            maxAge: 90 * 24 * 60 * 60 * 1000,
+        }).cookie("accessToken", data.accessToken, {
+            httpOnly: true,
+            secure: process.env.STACK === 'production',
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000}).json({
+            success: true
+        })
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+
+        clearCookie(res)
+
+    return errorHandler(res, error.message, error.statusCode);
+    }
+    
+}
+
+export async function logoutController(req: Request, res: Response)
+{
+    const {allDevices} = req.body;
+    const {refreshToken} = req.cookies;
+
+    try
+    {
+        await Service.logoutService(refreshToken, allDevices);
+
+        clearCookie(res)
+
+        return res.json({success: true})
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+
+        clearCookie(res)
+
+    return errorHandler(res, error.message, error.statusCode);
+    }
+    
 }

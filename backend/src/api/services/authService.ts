@@ -7,6 +7,7 @@ import { generateTokens } from "../utils/generateTokens.js";
 import sendEmailVerification from "../utils/mail/sendMail.js";
 import crypto from 'crypto'
 import sendResetMail from "../utils/mail/sendResetPasswordMail.js";
+import jwt from 'jsonwebtoken'
 
 export async function loginService(email: string, password: string)
 {
@@ -294,4 +295,98 @@ export async function resetPasswordService(password:string, token:string)
         {
             handleServiceError(err)
         }
+}
+
+export async function refreshService(refreshToken: string)
+{
+    if(!refreshToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    refreshToken = refreshToken.trim()
+
+    if(!refreshToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    const hashedRefreshToken = crypto
+            .createHash('sha256')
+            .update(refreshToken)
+            .digest('hex');
+
+
+    try
+    {
+        const data = await Repo.takeRefreshTokenByToken(hashedRefreshToken);
+
+        if(!data)
+        {
+            throw new AppError("Nieprawidłowy token", 400)
+        }
+
+        if(data.expires_at < new Date())
+        {
+            await Repo.deleteRefreshtokenByToken(hashedRefreshToken)
+            throw new AppError("Token wygasł, zaloguj się ponownie", 401)
+        }
+
+        await Repo.deleteRefreshtokenByToken(hashedRefreshToken);
+
+        const tokens = generateTokens(data.user_id);
+
+        await Repo.createRefreshtoken(tokens.hashedRefreshToken, tokens.expires_at)
+
+        return {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken
+        }
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+}
+
+export async function logoutService(refreshToken: string, allDevices: boolean)
+{
+    if(!refreshToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    refreshToken = refreshToken.trim()
+
+    if(!refreshToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    const hashedRefreshToken = crypto
+            .createHash('sha256')
+            .update(refreshToken)
+            .digest('hex');
+
+    try
+    {
+        if(allDevices)
+        {
+           const data = await Repo.takeRefreshTokenByToken(hashedRefreshToken);
+
+           if(!data)
+           {
+            throw new AppError("Brak uprawnień do wylogowania użytkownika", 403)
+           }
+
+           await Repo.deleteRefreshtokenById(data.user_id)
+        }
+        else{
+            await Repo.deleteRefreshtokenByToken(hashedRefreshToken);
+        }
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
 }

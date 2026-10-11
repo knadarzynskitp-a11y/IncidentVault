@@ -9,7 +9,7 @@ router.post('/registerEnd', Controllers.registerEndController);
 router.post('/forgotPassword', Controllers.forgotPasswordController);
 router.post('/resetPassword', Controllers.resetPasswordController);
 router.post('/logout', );
-router.get('refresh', )
+router.get('/refresh', )
 router.post('/nrtelAdd', );
 router.post('/nrtelEnd', );
 

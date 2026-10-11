@@ -1,5 +1,8 @@
 import {pool} from '../../config/db.js'
 
+
+//================USERS OPERATION=========================================================================================
+
 export async function findByEmail(email: string)
 {
     const result = await pool.query(
@@ -20,6 +23,26 @@ export async function findById(user_id: number)
     return result.rows[0];
 }
 
+export async function createUser(name: string, lastname: string, email: string, hashedPassword: string)
+{
+    await pool.query(
+        "INSERT INTO users (name, lastname, email, password) VALUES ($1, $2, $3, $4)",
+        [name, lastname, email, hashedPassword]
+    );
+}
+
+export async function updateUser(user_id:number, password: string)
+{
+    await pool.query(
+        "UPDATE users SET password = $1 WHERE id = $2",
+        [password, user_id]
+    )
+}
+
+
+//=================REFRESH TOKENS OPERATION========================================================================================
+
+
 export async function createRefreshtoken(hashedRefreshToken: string, expires_at: Date)
 {
     await pool.query(
@@ -27,6 +50,36 @@ export async function createRefreshtoken(hashedRefreshToken: string, expires_at:
         [hashedRefreshToken, expires_at]
     );
 }
+
+export async function takeRefreshTokenByToken(hashedRefreshToken:string)
+{
+    const data = await pool.query(
+        "SELECT * FROM refreshtokens WHERE hashedrefreshtoken=$1", 
+        [hashedRefreshToken]
+    );
+
+    return data.rows[0]
+}
+
+export async function deleteRefreshtokenByToken(hashedRefreshToken: string)
+{
+    await pool.query(
+        "DELETE * FROM refreshtokens WHERE hashedrefreshtoken=$1",
+        [hashedRefreshToken]
+    );
+}
+
+export async function deleteRefreshtokenById(user_id: number)
+{
+    await pool.query(
+        "DELETE * FROM refreshtokens WHERE user_id=$1",
+        [user_id]
+    );
+}
+
+
+//================EMAIL VERIFICATION OPERATION=========================================================================================
+
 
 export async function deleteOldDataEmailVerification(email:string)
 {
@@ -53,13 +106,11 @@ export async function takeEmailVerificationDataByEmail(email: string)
     return data.rows[0];
 }
 
-export async function createUser(name: string, lastname: string, email: string, hashedPassword: string)
-{
-    await pool.query(
-        "INSERT INTO users (name, lastname, email, password) VALUES ($1, $2, $3, $4)",
-        [name, lastname, email, hashedPassword]
-    );
-}
+
+//==================RESET PASSWORD OPERATION=======================================================================================
+
+
+
 
 export async function deleteResetPasswordDataById(user_id: number)
 {
@@ -87,10 +138,3 @@ export async function takeResetPasswordDataByToken(hashedtoken: string)
     return result.rows[0];
 }
 
-export async function updateUser(user_id:number, password: string)
-{
-    await pool.query(
-        "UPDATE users SET password = $1 WHERE id = $2",
-        [password, user_id]
-    )
-}
