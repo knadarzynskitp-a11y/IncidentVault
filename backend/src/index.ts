@@ -4,21 +4,49 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { connectDatabase } from './config/db.js';
 import authRoutes from './api/routes/authRoutes.js'
-
+import cookieParser from 'cookie-parser';
 
 const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use(cookieParser())
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: process.env.URL,
   credentials: true,
 }));
 
 app.use(helmet())
 
+//=======================strefa AI=================================================
+const requiredEnv = [
+    'DB_HOST',
+    'DB_USER',
+    'DB_PASSWORD',
+    'DB_NAME',
+    'JWT_SECRET',
+    'USER_EMAIL',
+    'USER_PASS',
+    'URL',
+    'STACK',
+];
+
+const missingEnv = requiredEnv.filter(
+    name => !process.env[name]?.trim()
+);
+
+if (missingEnv.length > 0) {
+    console.error(
+        `Brak wymaganych zmiennych środowiskowych: ${missingEnv.join(', ')}`
+    );
+
+    process.exit(1);
+}
+//=====================================koniec strefy AI========================================
+
+//routy
 app.use('/auth', authRoutes)
 
 connectDatabase();

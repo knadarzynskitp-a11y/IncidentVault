@@ -1,6 +1,6 @@
 import errorHandler from "../middleware/errors/errorHandler.js"
 import * as Service from '../services/authService.js'
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, response, Response } from 'express';
 import { clearCookie } from "../utils/clearCookie.js";
 
 export async function loginController(req: Request, res: Response)
@@ -160,4 +160,21 @@ export async function logoutController(req: Request, res: Response)
     return errorHandler(res, error.message, error.statusCode);
     }
     
+}
+
+export async function requireBeLoggedConroller(req: Request, res: Response, next: NextFunction)
+{
+    const {accessToken} = req.cookies;
+
+    try
+    {
+        await Service.requireBeLoggedService(accessToken);
+
+        next();
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode);
+    }
 }

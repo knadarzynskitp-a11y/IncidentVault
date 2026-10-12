@@ -395,3 +395,33 @@ export async function logoutService(refreshToken: string, allDevices: boolean)
         handleServiceError(err)
     }
 }
+
+export async function requireBeLoggedService(accessToken: string)
+{
+    if(!accessToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    accessToken = accessToken.trim()
+
+    if(!accessToken)
+    {
+        throw new AppError("Wprowadź dane", 400)
+    }
+
+    try
+    {
+        return jwt.verify(accessToken, process.env.JWT_SECRET!)
+    }
+    catch(err)
+    {
+        if (err instanceof jwt.TokenExpiredError || err instanceof jwt.JsonWebTokenError || err instanceof jwt.NotBeforeError) 
+        {
+            throw new AppError("Zaloguj się ponownie", 401);
+        }
+    throw err;
+    }
+
+    
+}
