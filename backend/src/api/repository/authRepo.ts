@@ -138,3 +138,44 @@ export async function takeResetPasswordDataByToken(hashedtoken: string)
     return result.rows[0];
 }
 
+
+
+//==================Transactions==========================================================
+
+export async function resetTransaction(user_id: number, password: string, )
+{
+    const client = await pool.connect();
+
+    try
+    {
+        await client.query("BEGIN")
+
+        //zapytania do bazy
+        await client.query(
+            "UPDATE users SET password=$1 WHERE id=$2",
+            [password, user_id]
+        );
+
+        await client.query(
+            "DELETE FROM resetpassword WHERE user_id=$1",
+            [user_id]
+        );
+
+        await client.query(
+            "DELETE FROM refreshtokens WHERE user_id=$1",
+            [user_id]
+        );
+
+        await client.query("COMMIT")
+    }
+    catch(err)
+    {
+        await client.query("ROLLBACK");
+        throw err;
+    }
+    finally
+    {
+        client.release()
+    }
+    
+}
