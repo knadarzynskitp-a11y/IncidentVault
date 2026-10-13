@@ -31,6 +31,10 @@ const requiredEnv = [
     'USER_PASS',
     'URL',
     'STACK',
+    'R2_URL',
+    'R2_NAME',
+    'R2_ACCESS_KEY',
+    'R2_SECRET_ACCESS_KEY'
 ];
 
 const missingEnv = requiredEnv.filter(
