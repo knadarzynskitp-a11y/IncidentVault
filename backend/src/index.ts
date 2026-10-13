@@ -4,7 +4,9 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { connectDatabase } from './config/db.js';
 import authRoutes from './api/routes/authRoutes.js'
-import cookieParser from 'cookie-parser';
+import userRoutes from './api/routes/userRoutes.js'
+import cookieParser from 'cookie-parser'
+import { testConnectToR2 } from './config/cloudflarer2.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -52,9 +54,10 @@ if (missingEnv.length > 0) {
 
 //routy
 app.use('/auth', authRoutes)
+app.use('/home', userRoutes)
 
 connectDatabase();
-
+testConnectToR2();
 app.listen(PORT, () => {
     console.log(`Serwer running on port ${PORT}`);
 });

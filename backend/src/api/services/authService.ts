@@ -412,7 +412,18 @@ export async function requireBeLoggedService(accessToken: string)
 
     try
     {
-        return jwt.verify(accessToken, process.env.JWT_SECRET!)
+       const payload = jwt.verify(accessToken, process.env.JWT_SECRET!);
+
+        if (
+            typeof payload === 'string' ||
+            typeof payload.user_id !== 'number' ||
+            !Number.isSafeInteger(payload.user_id) ||
+            payload.user_id <= 0
+        ) {
+            throw new AppError("Zaloguj się ponownie", 401);
+        }
+
+        return { user_id: payload.user_id };
     }
     catch(err)
     {

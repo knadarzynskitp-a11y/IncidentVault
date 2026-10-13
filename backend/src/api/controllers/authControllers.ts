@@ -168,7 +168,9 @@ export async function requireBeLoggedConroller(req: Request, res: Response, next
 
     try
     {
-        await Service.requireBeLoggedService(accessToken);
+        const data = await Service.requireBeLoggedService(accessToken);
+
+        res.locals.user_id = data.user_id;
 
         next();
     }
