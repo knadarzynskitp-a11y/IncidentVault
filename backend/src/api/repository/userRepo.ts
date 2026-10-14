@@ -32,3 +32,20 @@ export async function addLawsuitTransaction(user_id: number, tytul: string, opis
         client.release()
     }
 }
+
+export async function checkUser(lawsuit_id: number, user_id: number)
+{
+    const result = await pool.query(
+        "SELECT role FROM is_part_of_lawsuit WHERE lawsuit_id=$1 AND user_id=$2",
+        [lawsuit_id, user_id]
+    );
+    return result.rows[0];
+}
+
+export async function addMemberToLawsuit(lawsuit_id: number, member_id: number, role: string)
+{
+    await pool.query(
+        "INSERT INTO is_part_of_lawsuit (lawsuit_id, user_id, role) VALUES ($1, $2, $3)",
+        [lawsuit_id, member_id, role]
+    )
+}
