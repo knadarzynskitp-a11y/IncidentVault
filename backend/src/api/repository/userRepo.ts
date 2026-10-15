@@ -49,3 +49,21 @@ export async function addMemberToLawsuit(lawsuit_id: number, member_id: number, 
         [lawsuit_id, member_id, role]
     )
 }
+
+export async function addEvidence(user_id: number, lawsuit_id: number, name: string, opis: string)
+{
+    await pool.query(
+        "INSERT INTO evidences (user_id, lawsuit_id, name, opis) VALUES ($1, $2, $3, $4)",
+        [user_id, lawsuit_id, name, opis]
+    );
+}
+
+/*
+export async function findEvidenceById(evidence_id: number) {
+    const result = await pool.query(
+        "SELECT id, lawsuit_id FROM evidences WHERE id = $1",
+        [evidence_id]
+    );
+
+    return result.rows[0];
+}*/
