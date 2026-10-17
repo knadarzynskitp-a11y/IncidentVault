@@ -191,3 +191,22 @@ export async function checkEvidenceUploadAccess(user_id: number, evidence_id: nu
         handleServiceError(err);
     }
 }
+
+export async function takeLawsuitsService(user_id: number)
+{
+    if(!user_id || user_id <= 0 || !Number.isSafeInteger(user_id))
+    {
+        throw new AppError("Nieprawidłowe ID", 400);
+    }
+
+    try
+    {
+        const data = await Repo.takeLawsuits(user_id);
+
+        return data;
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+}

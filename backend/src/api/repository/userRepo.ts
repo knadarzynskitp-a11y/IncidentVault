@@ -86,3 +86,12 @@ export async function addEvidenceFile(data: EvidenceFileData) {
 
     return result.rows[0]!;
 }
+
+export async function takeLawsuits(user_id: number)
+{
+    const result = await pool.query(
+        "SELECT l.id, l.tytul FROM lawsuit AS l JOIN is_part_of_lawsuit AS p ON l.id=p.lawsuit_id WHERE p.user_id=$1 ORDER BY l.created_at DESC",
+        [user_id]
+    );
+    return result.rows;
+}

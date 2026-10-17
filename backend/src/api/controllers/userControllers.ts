@@ -59,4 +59,22 @@ export async function addEvidenceController(req: Request, res: Response)
     }
 }
 
+export async function takeLawsuitsController(req: Request, res: Response)
+{
+    try
+    {
+        const user_id = res.locals.user_id;
+
+        const data = await Service.takeLawsuitsService(user_id)
+
+        return res.json({success: true, data: data});
+    }
+    catch(err)
+    {
+       const error = err as {message: string; statusCode: number};
+       return errorHandler(res, error.message, error.statusCode) 
+    }
+    
+}
+
 
