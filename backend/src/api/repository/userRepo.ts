@@ -58,7 +58,7 @@ export async function addEvidence(user_id: number, lawsuit_id: number, name: str
     );
 }
 
-/*
+
 export async function findEvidenceById(evidence_id: number) {
     const result = await pool.query(
         "SELECT id, lawsuit_id FROM evidences WHERE id = $1",
@@ -66,4 +66,23 @@ export async function findEvidenceById(evidence_id: number) {
     );
 
     return result.rows[0];
-}*/
+}
+
+export type EvidenceFileData = {
+    evidence_id: number;
+    uploaded_by: number;
+    original_name: string;
+    storage_key: string;
+    mime_type: string;
+    size_bytes: number;
+    sha256_hash: string;
+};
+
+export async function addEvidenceFile(data: EvidenceFileData) {
+    const result = await pool.query(
+        `INSERT INTO files_evidences (evidence_id, uploaded_by, original_name, storage_key, mime_type, size_bytes, sha256_hash) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        [data.evidence_id, data.uploaded_by, data.original_name, data.storage_key, data.mime_type, data.size_bytes, data.sha256_hash]
+    );
+
+    return result.rows[0]!;
+}

@@ -144,7 +144,7 @@ export async function addEvidenceService(user_id: number, lawsuit_id: number, na
 
 }
 
-/*
+
 export async function checkLawsuitAccessService(user_id: number, lawsuit_id: number) {
     if (!Number.isSafeInteger(user_id) || user_id <= 0) {
         throw new AppError("Zaloguj się ponownie", 401);
@@ -169,13 +169,13 @@ export async function checkLawsuitAccessService(user_id: number, lawsuit_id: num
     }
 }
 
-export async function checkEvidenceUploadAccess(
-    user_id: number,
-    evidence_id: number
-) {
+export async function checkEvidenceUploadAccess(user_id: number, evidence_id: number) {
     if (!Number.isSafeInteger(evidence_id) || evidence_id <= 0) {
         throw new AppError("Nieprawidłowe ID dowodu", 400);
     }
+    if (!Number.isSafeInteger(user_id) || user_id <= 0) {
+            throw new AppError("Zaloguj się ponownie", 401);
+        }
 
     try {
         const evidence = await Repo.findEvidenceById(evidence_id);
@@ -190,4 +190,4 @@ export async function checkEvidenceUploadAccess(
     } catch (err) {
         handleServiceError(err);
     }
-}*/
+}
