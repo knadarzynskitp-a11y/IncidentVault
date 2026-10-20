@@ -9,5 +9,7 @@ router.post('/lawsuits/members/:lawsuitId', requireBeLoggedConroller, Controller
 router.post('/lawsuits/addEvidence/:lawsuitId', requireBeLoggedConroller, Controllers.addEvidenceController);
 router.post('/evidences/:evidenceId/files', requireBeLoggedConroller, addEvidenceFileController);
 router.get('/lawsuits/takelawsuits', requireBeLoggedConroller, Controllers.takeLawsuitsController)
+router.get('/lawsuits/takelawsuit/:lawsuitId', requireBeLoggedConroller, Controllers.takeLawsuitController)
+router.get('/evidences/takeEvidence/:evidenceId', requireBeLoggedConroller, Controllers.takeEvidenceController)
 
 export default router;

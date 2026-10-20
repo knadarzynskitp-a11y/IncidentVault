@@ -95,3 +95,31 @@ export async function takeLawsuits(user_id: number)
     );
     return result.rows;
 }
+
+export async function takeLawsuit(lawsuit_id: number)
+{
+    const result = await pool.query(
+        "SELECT id, tytul, opis FROM lawsuit WHERE id=$1",
+        [lawsuit_id]
+    );
+    return result.rows[0];
+}
+
+export async function takeLawsuit2(lawsuit_id: number)
+{
+    const result = await pool.query(
+        "SELECT id, name, opis FROM evidences WHERE lawsuit_id=$1",
+        [lawsuit_id]
+    );
+    return result.rows;
+}
+
+export async function takeEvidence(evidence_id: number)
+{
+    const result = await pool.query(
+        "SELECT * FROM evidences WHERE id=$1",
+        [evidence_id]
+    );
+
+    return result.rows[0];
+}

@@ -77,4 +77,40 @@ export async function takeLawsuitsController(req: Request, res: Response)
     
 }
 
+export async function takeLawsuitController(req: Request, res: Response)
+{
+    try
+    {
+        const user_id = res.locals.user_id;
+        const lawsuit_id = Number(req.params.lawsuitId);
+
+        const data = await Service.takeLawsuitService(user_id, lawsuit_id)
+
+        return res.json({success: true, data})
+    }
+    catch(err)
+    {
+      const error = err as {message: string; statusCode: number};
+       return errorHandler(res, error.message, error.statusCode)   
+    }
+}
+
+export async function takeEvidenceController(req: Request, res: Response)
+{
+    try
+    {
+        const evidence_id = Number(req.params.evidenceId);
+        const user_id = res.locals.user_id;
+
+        const data = await Service.takeEvidenceService(user_id, evidence_id)
+
+        res.json({success: true, data})
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+       return errorHandler(res, error.message, error.statusCode) 
+    }
+}
+
 

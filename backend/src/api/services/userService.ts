@@ -210,3 +210,59 @@ export async function takeLawsuitsService(user_id: number)
         handleServiceError(err)
     }
 }
+
+export async function takeLawsuitService(user_id: number, lawsuit_id: number)
+{
+    if(!user_id || user_id <= 0 || !Number.isSafeInteger(user_id) || !lawsuit_id || lawsuit_id <= 0 || !Number.isSafeInteger(lawsuit_id))
+    {
+        throw new AppError("Nieprawidłowe ID", 400);
+    }
+
+    try
+    {
+    const membership = await Repo.checkUser(lawsuit_id, user_id);
+
+    if(!membership)
+    {
+        throw new AppError("Brak uprawnień", 403)
+    }
+
+        const lawsuit_data = await Repo.takeLawsuit(lawsuit_id)
+        const evidences_data = await Repo.takeLawsuit2(lawsuit_id)
+
+        if(!lawsuit_data)
+        {
+            throw new AppError("Brak danych", 400)
+        }
+
+        return {
+            lawsuit_data,
+            evidences_data
+        }
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+
+}
+
+export async function takeEvidenceService(user_id: number, evidence_id: number)
+{
+    if(!user_id || !evidence_id )
+    {
+        throw new AppError("Nieprawidłowe ID", 400);
+    }
+
+    try
+    {
+        await checkEvidenceUploadAccess(user_id, evidence_id)
+        const data = await Repo.takeEvidence(evidence_id)
+    
+        return data;
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+}
