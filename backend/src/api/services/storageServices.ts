@@ -1,7 +1,8 @@
 import {Upload} from "@aws-sdk/lib-storage"
-import { DeleteObjectCommand } from "@aws-sdk/client-s3"
+import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import type {Readable} from 'node:stream'
 import {r2} from '../../config/cloudflarer2.js'
+import { AppError } from "../middleware/errors/AppError.js"
 
 export function createFileUpload(file: Readable, key: string)
 {
@@ -26,4 +27,21 @@ export async function deleteFile(key: string) {
             Key: key
         })
     );
+}
+
+export async function getFile(key: string)
+{
+    const result = await r2.send(
+        new GetObjectCommand({
+            Bucket: process.env.R2_NAME!,
+            Key: key
+        })
+    )
+
+    if(!result.Body)
+    {
+        throw new AppError("R2 nie zwróciło zawartości pliku", 404)
+    }
+
+    return result.Body;
 }
