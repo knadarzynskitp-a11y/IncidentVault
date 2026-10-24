@@ -1,7 +1,7 @@
-import { JSONCookie } from "cookie-parser";
 import { AppError } from "../middleware/errors/AppError.js";
 import * as Repo from '../repository/userRepo.js'
 import { handleServiceError } from "../utils/handleServiceError.js";
+import {getFile} from './storageServices.js'
 
 export async function addLawsuitService(user_id: number, tytul: string, opis: string)
 {
@@ -258,11 +258,46 @@ export async function takeEvidenceService(user_id: number, evidence_id: number)
     {
         await checkEvidenceUploadAccess(user_id, evidence_id)
         const data = await Repo.takeEvidence(evidence_id)
-    
-        return data;
+        const files_data = await Repo.takeFiles(evidence_id)
+
+        return {data, files_data};
     }
     catch(err)
     {
         handleServiceError(err)
     }
+}
+
+export async function takeFileService(user_id: number, evidence_id: number, file_id: number)
+{
+    if(!user_id || !evidence_id || !file_id || file_id <= 0 || !Number.isSafeInteger(file_id))
+    {
+        throw new AppError("Nieprawidłowe ID", 400);
+    }
+
+    let file_data;
+
+    try
+    {
+        await checkEvidenceUploadAccess(user_id, evidence_id);
+        file_data = await Repo.takeFileById(file_id, evidence_id)
+
+        if(!file_data)
+        {
+            throw new AppError("Nie znaleziono pliku", 404)
+        }
+
+        const stream = await getFile(file_data.storage_key);
+
+        return {
+            stream,
+            original_name: file_data.original_name
+        };
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+
+
 }

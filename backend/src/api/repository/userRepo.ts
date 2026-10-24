@@ -123,3 +123,23 @@ export async function takeEvidence(evidence_id: number)
 
     return result.rows[0];
 }
+
+export async function takeFiles(evidence_id: number)
+{
+    const result = await pool.query(
+        "SELECT * FROM files_evidences WHERE evidence_id=$1",
+        [evidence_id]
+    );
+
+    return result.rows;
+}
+
+export async function takeFileById(id: number, evidence_id: number)
+{
+    const result = await pool.query(
+        "SELECT * FROM files_evidences WHERE id=$1 AND evidence_id=$2",
+        [id, evidence_id]
+    );
+
+    return result.rows[0];
+}

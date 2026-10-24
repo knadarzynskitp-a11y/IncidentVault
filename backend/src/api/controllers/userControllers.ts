@@ -1,7 +1,8 @@
 import errorHandler from "../middleware/errors/errorHandler.js"
 import * as Service from '../services/userService.js'
 import type { Request, Response } from 'express';
-
+import { pipeline } from 'node:stream/promises';
+import { AppError } from '../middleware/errors/AppError.js';
 
 export async function addLawsuitController(req: Request, res: Response)
 {
@@ -102,12 +103,58 @@ export async function takeEvidenceController(req: Request, res: Response)
         const evidence_id = Number(req.params.evidenceId);
         const user_id = res.locals.user_id;
 
-        const data = await Service.takeEvidenceService(user_id, evidence_id)
+        const {data, files_data} = await Service.takeEvidenceService(user_id, evidence_id)
 
-        res.json({success: true, data})
+        res.json({success: true, data, files_data})
     }
     catch(err)
     {
+        const error = err as {message: string; statusCode: number};
+       return errorHandler(res, error.message, error.statusCode) 
+    }
+}
+
+export async function takeFileController(req: Request, res: Response)
+{
+    try
+    {
+        const evidence_id = Number(req.params.evidenceId);
+        const file_id = Number(req.params.fileId);
+        const user_id = res.locals.user_id;
+
+        const {stream, original_name} = await Service.takeFileService(user_id, evidence_id, file_id);
+
+        try
+        {
+            res.attachment(original_name);
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('Cache-Control', 'no-store');
+            await pipeline(stream, res)
+        }
+        finally
+        {
+            stream.destroy();
+        }
+    }
+    catch(err)
+    {
+        if(res.destroyed) return;
+
+        if(res.headersSent)
+            {
+                res.destroy();
+                return
+            }
+
+        res.removeHeader('Content-Disposition');
+        res.removeHeader('Content-Length');
+
+        if (err instanceof AppError) {
+            return errorHandler(res, err.message, err.statusCode);
+        }
+
+        console.error(err);
+        
         const error = err as {message: string; statusCode: number};
        return errorHandler(res, error.message, error.statusCode) 
     }

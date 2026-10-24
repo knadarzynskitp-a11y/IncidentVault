@@ -1,6 +1,6 @@
 import {Upload} from "@aws-sdk/lib-storage"
 import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
-import type {Readable} from 'node:stream'
+import {Readable} from 'node:stream'
 import {r2} from '../../config/cloudflarer2.js'
 import { AppError } from "../middleware/errors/AppError.js"
 
@@ -43,5 +43,9 @@ export async function getFile(key: string)
         throw new AppError("R2 nie zwróciło zawartości pliku", 404)
     }
 
+    if (!(result.Body instanceof Readable)) {
+        throw new AppError("R2 nie zwróciło strumienia pliku", 502);
+    }
+    
     return result.Body;
 }

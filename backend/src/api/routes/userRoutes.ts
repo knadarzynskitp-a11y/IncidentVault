@@ -11,5 +11,6 @@ router.post('/evidences/:evidenceId/files', requireBeLoggedConroller, addEvidenc
 router.get('/lawsuits/takelawsuits', requireBeLoggedConroller, Controllers.takeLawsuitsController)
 router.get('/lawsuits/takelawsuit/:lawsuitId', requireBeLoggedConroller, Controllers.takeLawsuitController)
 router.get('/evidences/takeEvidence/:evidenceId', requireBeLoggedConroller, Controllers.takeEvidenceController)
+router.get('/evidences/:evidenceId/file/:fileId/download', requireBeLoggedConroller, Controllers.takeFileController)
 
 export default router;
