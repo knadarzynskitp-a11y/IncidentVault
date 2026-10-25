@@ -1,2 +1,10 @@
-# IncidentVault
-IncidentVault is an application where, as a forensic IT specialist, you can upload your documents and investigation evidence.
+Użyłem tu layer architecture
+
+Baza: postgresql
+
+Przechowywanie plików: cloudflare r2
+
+Język: Typescript
+
+
+
