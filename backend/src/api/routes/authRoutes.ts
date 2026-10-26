@@ -1,6 +1,6 @@
 import express from 'express';
 import * as Controllers from '../controllers/authControllers.js'
-import { authLimiter } from '../middleware/rateLimiters/authRateLimiter.js';
+import { authLimiter } from '../middleware/rateLimiters/RateLimiters.js';
 const router = express.Router();
 
 router.post('/login', authLimiter, Controllers.loginController);

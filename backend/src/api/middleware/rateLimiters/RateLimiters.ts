@@ -8,6 +8,7 @@ export const authLimiter = rateLimit({
 	standardHeaders: true, 
 	legacyHeaders: false, 
 	store: new RedisStore({
+		 prefix: 'rl:auth:',
 		sendCommand: (...args: string[]) => client.sendCommand(args),
 	}),
 });
@@ -18,6 +19,7 @@ export const userLimiter = rateLimit({
 	standardHeaders: true, 
 	legacyHeaders: false, 
 	store: new RedisStore({
+		 prefix: 'rl:user:',
 		sendCommand: (...args: string[]) => client.sendCommand(args),
 	}),
 });
