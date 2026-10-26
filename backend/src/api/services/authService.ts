@@ -107,9 +107,9 @@ export async function registerService(name: string, lastname: string, email: str
         throw new AppError("Hasło jest zbyt długie", 400);
     }
     const zawieraCyfry = /\d/.test(name);
-    const zawieraZnakiSpecjalne = /[^A-Za-z0-9]/.test(name);
+    const zawieraZnakiSpecjalne = /[^A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(name);
     const zawieraCyfry2 = /\d/.test(lastname);
-    const zawieraZnakiSpecjalne2 = /[^A-Za-z0-9]/.test(lastname);
+    const zawieraZnakiSpecjalne2 = /[^A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(lastname);
 
     if(zawieraCyfry || zawieraCyfry2 || zawieraZnakiSpecjalne || zawieraZnakiSpecjalne2)
     {
