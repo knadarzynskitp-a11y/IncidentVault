@@ -31,7 +31,7 @@ services:
 
     volumes:
     - postgres_data:/var/lib/postgresql
-
+    - ./database/baza.sql:/docker-entrypoint-initdb.d/baza.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d incidentvault"]
       interval: 5s
