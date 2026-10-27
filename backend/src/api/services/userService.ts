@@ -301,3 +301,34 @@ export async function takeFileService(user_id: number, evidence_id: number, file
 
 
 }
+
+export async function deleteLawsuitService(user_id: number, lawsuit_id: number)
+{
+
+    if(!user_id || !lawsuit_id)
+    {
+        throw new AppError("Nieprawidłowe ID", 400);
+    }
+
+    try
+    {
+        await checkLawsuitAccessService(user_id, lawsuit_id)
+
+        const data = await Repo.takeRoleLawsuit(user_id, lawsuit_id)
+
+        if(!data)
+        {
+            throw new AppError("Nie znaleziono takiej sprawy", 404)
+        }
+        else if(data.role != "Leader")
+        {
+            throw new AppError("Brak uprawnień", 403)
+        }
+
+        await Repo.deleteLawsuit(lawsuit_id)
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+}

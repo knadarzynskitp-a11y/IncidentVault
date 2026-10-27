@@ -143,3 +143,21 @@ export async function takeFileById(id: number, evidence_id: number)
 
     return result.rows[0];
 }
+
+export async function takeRoleLawsuit(user_id: number, lawsuit_id: number)
+{
+    const result = await pool.query(
+        "SELECT role FROM is_part_of_lawsuit WHERE user_id=$1 AND lawsuit_id=$2",
+        [user_id, lawsuit_id]
+    );
+
+    return result.rows[0];
+}
+
+export async function deleteLawsuit(lawsuit_id: number)
+{
+    await pool.query(
+        "DELETE FROM lawsuit WHERE id=$1",
+        [lawsuit_id]
+    );
+}

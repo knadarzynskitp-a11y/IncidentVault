@@ -1,6 +1,6 @@
 import errorHandler from "../middleware/errors/errorHandler.js"
 import * as Service from '../services/userService.js'
-import type { Request, Response } from 'express';
+import { RequestResponse,  } from 'express';
 import { pipeline } from 'node:stream/promises';
 import { AppError } from '../middleware/errors/AppError.js';
 
@@ -160,4 +160,18 @@ export async function takeFileController(req: Request, res: Response)
     }
 }
 
+export async function deleteLawsuitController(req: Request, res: Response)
+{
+    try
+    {
+        const user_id = res.locals.user_id;
+        const lawsuit_id = Number(req.params.lawsuitId)
 
+        await Service.deleteLawsuitService(user_id, lawsuit_id);
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode) 
+    }
+}
