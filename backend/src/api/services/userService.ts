@@ -332,3 +332,28 @@ export async function deleteLawsuitService(user_id: number, lawsuit_id: number)
         handleServiceError(err)
     }
 }
+
+export async function deleteEvidenceService(user_id: number, evidence_id: number)
+{
+    if(!user_id || !evidence_id)
+    {
+        throw new AppError("Nieprawidlowe ID", 400)
+    }
+
+    try
+    {
+        const data = await checkEvidenceUploadAccess(user_id, evidence_id);
+
+        if(data.user_id != user_id)
+        {
+            throw new AppError("Brak uprawnień", 403)
+        }
+
+        
+    }
+    catch(err)
+    {
+        handleServiceError(err)
+    }
+
+}

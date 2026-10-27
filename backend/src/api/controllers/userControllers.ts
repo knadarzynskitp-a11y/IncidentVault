@@ -175,3 +175,31 @@ export async function deleteLawsuitController(req: Request, res: Response)
         return errorHandler(res, error.message, error.statusCode) 
     }
 }
+
+export async function deleteEvidenceController(req: Request, res: Response)
+{
+    try
+    {
+        const user_id = res.locals.user_id;
+        const evidence_id = Number(req.params.evidenceId);
+
+        await Service.deleteEvidenceService(user_id, evidence_id)
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode)
+    }
+}
+
+/*
+try
+    {
+
+    }
+    catch(err)
+    {
+        const error = err as {message: string; statusCode: number};
+        return errorHandler(res, error.message, error.statusCode)
+    }
+*/
