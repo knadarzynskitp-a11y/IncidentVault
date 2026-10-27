@@ -14,7 +14,7 @@ router.get('/lawsuits/takelawsuits', requireBeLoggedConroller, Controllers.takeL
 router.get('/lawsuits/takelawsuit/:lawsuitId', requireBeLoggedConroller, Controllers.takeLawsuitController)
 router.get('/evidences/takeEvidence/:evidenceId', requireBeLoggedConroller, Controllers.takeEvidenceController)
 router.get('/evidences/:evidenceId/file/:fileId/download', requireBeLoggedConroller, Controllers.takeFileController)
-router.delete('lawsuits/delete/:lawsuitId', requireBeLoggedConroller, Controllers.deleteLawsuitController)
-router.delete('evidences/delete/:evidenceId', requireBeLoggedConroller, Controllers.deleteEvidenceController)
+router.delete('/lawsuits/delete/:lawsuitId', requireBeLoggedConroller, Controllers.deleteLawsuitController)
+router.delete('/evidences/delete/:evidenceId', requireBeLoggedConroller, Controllers.deleteEvidenceController)
 
 export default router;

@@ -349,7 +349,7 @@ export async function deleteEvidenceService(user_id: number, evidence_id: number
             throw new AppError("Brak uprawnień", 403)
         }
 
-        
+        await Repo.deleteEvidenceTransaction(evidence_id)
     }
     catch(err)
     {

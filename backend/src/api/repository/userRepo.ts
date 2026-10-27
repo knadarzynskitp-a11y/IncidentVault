@@ -1,5 +1,5 @@
 import {pool} from "../../config/db.js"
-
+import {deleteFile} from '../services/storageServices.js'
 
 export async function addLawsuitTransaction(user_id: number, tytul: string, opis: string)
 {
@@ -62,7 +62,7 @@ export async function addEvidence(user_id: number, lawsuit_id: number, name: str
 
 export async function findEvidenceById(evidence_id: number) {
     const result = await pool.query(
-        "SELECT id, lawsuit_id FROM evidences WHERE id = $1",
+        "SELECT id, lawsuit_id, user_id FROM evidences WHERE id = $1",
         [evidence_id]
     );
 
@@ -163,7 +163,8 @@ export async function deleteLawsuit(lawsuit_id: number)
     );
 }
 
-export async function deleteEvidenceTransaction(user_id: number, evidence_id: number)
+
+export async function deleteEvidenceTransaction(evidence_id: number)
 {
     const client = await pool.connect();
 
@@ -171,8 +172,24 @@ export async function deleteEvidenceTransaction(user_id: number, evidence_id: nu
     {
         await client.query("BEGIN");
 
-        await 
+        const files = await client.query(
+            "SELECT * FROM files_evidences WHERE evidence_id=$1",
+        [evidence_id]
+        )
 
+        for (const file of files.rows)
+        {
+            await deleteFile(file.storage_key);
+            await client.query(
+                "DELETE FROM files_evidences WHERE id=$1",
+                [file.id]
+            )
+        }
+
+        await client.query(
+            "DELETE FROM evidences WHERE id=$1",
+        [evidence_id]
+    );
         await client.query("COMMIT");
     }
     catch(err)
