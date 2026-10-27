@@ -1,5 +1,6 @@
 import {pool} from "../../config/db.js"
 
+
 export async function addLawsuitTransaction(user_id: number, tytul: string, opis: string)
 {
     const client = await pool.connect();
@@ -160,4 +161,29 @@ export async function deleteLawsuit(lawsuit_id: number)
         "DELETE FROM lawsuit WHERE id=$1",
         [lawsuit_id]
     );
+}
+
+export async function deleteEvidenceTransaction(user_id: number, evidence_id: number)
+{
+    const client = await pool.connect();
+
+    try
+    {
+        await client.query("BEGIN");
+
+        await 
+
+        await client.query("COMMIT");
+    }
+    catch(err)
+    {
+        await client.query("ROLLBACK");
+        throw err;
+    }
+    finally
+    {
+        await client.release();
+    }
+
+
 }
