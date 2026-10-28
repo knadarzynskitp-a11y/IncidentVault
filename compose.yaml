@@ -9,31 +9,34 @@ services:
       environment:
         DB_HOST: db
         DB_PORT: 5432
-        DB_USER: postgres
-        DB_PASSWORD: dev_password_123
-        DB_NAME: incidentvault
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        DB_NAME: ${DB_NAME}
         REDIS_URL: redis://redis:6379
       depends_on:
         db:
           condition: service_healthy
+        migrate:
+          condition: service_completed_successfully
+        redis:
+          condition: service_started
 
           
   db:
     image: postgres:18
 
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: dev_password_123
-      POSTGRES_DB: incidentvault
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
 
     ports: 
     - "127.0.0.1:5433:5432"
 
     volumes:
     - postgres_data:/var/lib/postgresql
-    - ./database/baza.sql:/docker-entrypoint-initdb.d/baza.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d incidentvault"]
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -42,10 +45,24 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
-      - "127.0.0.1:6379:6379"
+      - "127.0.0.1:${REDIS_PORT}:6379"
     volumes:
       - redis_data:/data
     command: ["redis-server", "--appendonly", "yes"]
+
+  migrate:
+    build: ./backend
+    command: npm run migrate:up
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: ${DB_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
 
 volumes:
   postgres_data:

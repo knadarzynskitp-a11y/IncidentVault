@@ -1,0 +1,13 @@
+-- Up Migration
+
+CREATE TABLE resetpassword (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Down Migration
+
+DROP TABLE refreshpassword;

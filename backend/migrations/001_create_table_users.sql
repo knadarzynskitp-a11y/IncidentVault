@@ -1,0 +1,14 @@
+-- Up Migration
+
+CREATE TABLE users (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(40) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Down Migration
+
+DROP TABLE users;

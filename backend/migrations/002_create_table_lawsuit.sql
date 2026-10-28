@@ -1,0 +1,12 @@
+-- Up Migration
+
+CREATE TABLE lawsuit (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tytul VARCHAR(50) NOT NULL,
+    opis VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Down Migration
+
+DROP TABLE lawsuit;
