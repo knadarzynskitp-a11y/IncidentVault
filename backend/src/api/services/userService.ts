@@ -325,7 +325,14 @@ export async function deleteLawsuitService(user_id: number, lawsuit_id: number)
             throw new AppError("Brak uprawnień", 403)
         }
 
-        await Repo.deleteLawsuit(lawsuit_id)
+        const data2 = await Repo.takeLawsuit2(lawsuit_id);
+
+        if(data2.length > 0)
+        {
+            throw new AppError("Najpierw usuń wszystkie evidence", 409)
+        }
+
+        await Repo.deleteLawsuitTransaction(lawsuit_id)
     }
     catch(err)
     {
@@ -343,8 +350,9 @@ export async function deleteEvidenceService(user_id: number, evidence_id: number
     try
     {
         const data = await checkEvidenceUploadAccess(user_id, evidence_id);
+        const membership = await Repo.takeRoleLawsuit(user_id, data.lawsuit_id);
 
-        if(data.user_id != user_id)
+        if(data.user_id != user_id && membership?.role !== "Leader")
         {
             throw new AppError("Brak uprawnień", 403)
         }

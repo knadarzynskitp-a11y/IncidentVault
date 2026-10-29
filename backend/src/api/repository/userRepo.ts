@@ -204,3 +204,36 @@ export async function deleteEvidenceTransaction(evidence_id: number)
 
 
 }
+
+export async function deleteLawsuitTransaction(lawsuit_id: number)
+{
+    const client = await pool.connect();
+
+    try
+    {
+        await client.query("BEGIN");
+
+        await client.query(
+        "DELETE FROM is_part_of_lawsuit WHERE lawsuit_id=$1",
+        [lawsuit_id]
+    );
+
+        await client.query(
+        "DELETE FROM lawsuit WHERE id=$1",
+        [lawsuit_id]
+    );
+        
+        await client.query("COMMIT");
+    }
+    catch(err)
+    {
+        await client.query("ROLLBACK");
+        throw err;
+    }
+    finally
+    {
+        await client.release();
+    }
+
+
+}
